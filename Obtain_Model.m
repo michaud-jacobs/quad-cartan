@@ -100,11 +100,13 @@ Nw:=map<NX -> NX | [x_1,x_2,x_3,-x_4,-x_5,-x_6,-x_7,-x_8]>;  // New modular invo
 Nphi:=map< NX -> XNSplus13 | Nphis >;                        // New equations for map
  
 // Check that this new model is nonsingular at the primes used (rather long).
+/*
 for p in [3,5,31,43,53,61,73] do 
     print "Starting p =", p;
     NXp:=ChangeRing(NX,GF(p));
     assert IsNonsingular(NXp);
     print "Nonsingular mod", p;
 end for;
+*/
 
 
