@@ -1,5 +1,7 @@
 R<x_1,x_2,x_3,x_4,x_5,x_6,x_7,x_8>:=PolynomialRing(Rationals(),8); 
+S<X,Y,Z>:=PolynomialRing(Rationals(),3);   
 
+// Equations for starting model of X_ns(13)
 old_eqns :=
 [
     x_1^2 - x_1*x_3 - x_1*x_4 - x_1*x_7 + x_1*x_8 + x_2*x_4 + x_2*x_5 + 
@@ -59,6 +61,15 @@ old_eqns :=
         + x_3*x_8 + x_4^2 + 3*x_4*x_5 - 2*x_4*x_6 + x_4*x_7 + x_4*x_8 + 2*x_5^2 
         - 4*x_5*x_6 - 2*x_5*x_8 + 2*x_6*x_7 + x_7^2 - 2*x_7*x_8 + x_8^2
 ];
+
+
+// Equation for X_ns^+(13) 
+
+eqn_X_plus := (-Y-Z)*X^3+(2*Y^2+Z*Y)*X^2+(-Y^3+Z*Y^2-2*(Z^2)*Y+Z^3)*X+(2*Z^2*Y^2-3*Z^3*Y);
+
+// Equations for map rho from old model to X_ns^+(13)
+
+old_rho_eqns := [-3*x_1+2*x_2, -3*x_1+x_2+2*x_4-2*x_5, x_1+x_2+x_4-x_5];
 
 //////////////////////////////////////////////////////////////////////////////////
 
@@ -141,5 +152,10 @@ new_eqns :=
         1/4*x_4*x_5 - 1/2*x_4*x_7 + 1/4*x_4*x_8 + 1/4*x_5*x_6 + 3/4*x_5*x_8 + 
         1/2*x_6*x_7 + 3/2*x_6*x_8 + 1/4*x_7^2 - 1/4*x_7*x_8 + 3/2*x_8^2
 ];
+
+
+// Equations for map rho from new model to X_ns^+(13)
+
+new_rho_eqns := [-3*x_2 + 2*x_3, 2*x_1 - 3*x_2 + x_3, x_1 + x_2 + x_3];
 
 

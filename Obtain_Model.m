@@ -5,25 +5,19 @@
 
 load "eqn_data.m";
 
-XNS13:=Curve(ProjectiveSpace(R),old_eqns);  // The curve X_ns(13)
+X := Curve(ProjectiveSpace(R),old_eqns);  // The curve X_ns(13)
 
-S<X,Y,Z>:=PolynomialRing(Rationals(),3);   
-f:=(-Y-Z)*X^3+(2*Y^2+Z*Y)*X^2+(-Y^3+Z*Y^2-2*(Z^2)*Y+Z^3)*X+(2*Z^2*Y^2-3*Z^3*Y);
-XNSplus13:=Curve(ProjectiveSpace(S),f); // The curve X_ns^+(13),
+X_plus := Curve(ProjectiveSpace(S),eqn_X_plus); // The curve X_ns^+(13),
 
-Eqphi1:=-3*x_1+2*x_2;  // Equations for rho
-Eqphi2:=-3*x_1+x_2+2*x_4-2*x_5;
-Eqphi3:=x_1+x_2+x_4-x_5;
-eqnsphi:=[Eqphi1,Eqphi2,Eqphi3];
-phi:=map< XNS13->XNSplus13 | eqnsphi >; 
+rho :=map < X -> X_plus | old_rho_eqns >; 
 
 SvnPts:=PointSearch(XNSplus13,100);   
+assert #SvnPts eq 7;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 // We compute the pullbacks of the seven rational points on XNSplus13
-
 
 // We first compute the fields of definition and some pullback schemes
 
