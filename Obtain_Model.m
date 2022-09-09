@@ -59,7 +59,26 @@ EqTS:=DefiningEquations(TofS);
 
 w_old := map< old_X -> old_X | EqTS>;          // The modular involution on the curve
 Mw:=Transpose((Matrix(w_old)));        // Matrix of the modular involution 
-Diag,T:=PrimaryRationalForm(Mw);      
+
+// We now diagonalise the matrix. 
+// The following matrix was obtained from PrimaryRationalForm
+// We enter the matrix directly here since each call of PrimaryRationalForm can pick a different diagonalising matrix
+// The following ensures the equations we end up with match those of the paper.
+
+TZ := Matrix( [
+[ 0, 0, 0, 1,-1, 0, 0, 0],
+[ 1, 0, 0, 0, 0, 0, 0, 0],
+[ 0, 1, 0, 0, 0, 0, 0, 0],
+[ 1, 0, 0, 0, 0, 0, 0,-2],
+[ 1,-1,-2, 0, 0, 0, 0, 0],
+[ 1, 0, 0, 0, 0,-2, 0, 0],
+[ 0, 1, 0, 0, 0, 0,-2, 0],
+[ 0, 0, 0, 1, 1, 0, 0, 0]
+]);
+
+T := ChangeRing(TZ,Rationals());
+
+Diag := DiagonalMatrix([1,1,1,-1,-1,-1,-1,-1]);
 assert T*Mw*(T^-1) eq Diag;
                               
 Eqg := [&+[(T^-1)[i][j]*R.j : j in [1..8]] : i in [1..8]]; // We use T^-1 to find our change of coordinate map
@@ -68,20 +87,23 @@ g:=hom<R->R | Eqg>;                   // Change of coordinate map
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Apply our change of coordinates to obtain new equations
+// Multiply by 4 to clear denominators
 
-Neqns := [g(ee) : ee in old_eqns];
+Neqns := [4*g(ee) : ee in old_eqns];
 assert Neqns eq new_eqns; // Matches data file
 
 // Apply change of coordinates to obtain new equations for map (to same bottom curve)
 
 Nrhos := [g(ee) : ee in old_rho_eqns];
-assert Nrhos eq new_rho_eqns; // Matches data file
+assert Nrhos eq new_rho_eqns; // Matches data file, does not match paper, as version in paper is incorrect.
 
 // We now have the following new data:
 X:= Curve(ProjectiveSpace(R),new_eqns);                         // New model of our curve
-w:= map<X -> X | [x_1,x_2,x_3,-x_4,-x_5,-x_6,-x_7,-x_8]>;  // New modular involution
+w:= map<X -> X | [Diag[i][i]*R.i : i in [1..8]]>;  // New modular involution
 rho := map< X -> X_plus | new_rho_eqns >;                        // New equations for map
  
+
+
 // Check that this new model is nonsingular at the primes used (rather long).
 /*
 for p in [3,5,31,43,53,61,73] do 
