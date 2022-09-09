@@ -24,25 +24,35 @@ SvnPts:=PointSearch(XNSplus13,100);
 
 // We compute the pullbacks of the seven rational points on XNSplus13
 
-PQ := AmbientSpace(XNS13);
 
-T<x> := PolynomialRing(Rationals());   // Setting up a more general field that contains all the square roots we need
-ds := { -163, -67, -19, -11, -7, -2 };
-QQ := ext<Rationals() | [x^2 -d : d in ds] >;
-PQQ := BaseChange(PQ,QQ);
+// We first compute the fields of definition and some pullback schemes
 
-quad_pts1 := [ ];
-quad_pts2 := [ ];
+Ds := [];
 ds := {};
 for pt in SvnPts do
     S := Pullback(phi, pt);
     BS := BaseScheme(phi);
     D := Difference(S, BS);
+    Ds := Ds cat [D];
     pb, K1 := PointsOverSplittingField(D);
     K2 := NumberField(AbsolutePolynomial(K1));
     d := Squarefree(Discriminant(Integers(K2)));
     K := QuadraticField(d);
     ds := ds join {d};
+    
+end for;
+
+T<x> := PolynomialRing(Rationals());   // Setting up a more general field that contains all the square roots we need
+ds := { -163, -67, -19, -11, -7, -2 };
+QQ := ext<Rationals() | [x^2 -d : d in ds] >;
+PQ := AmbientSpace(XNS13);
+PQQ := BaseChange(PQ,QQ);
+
+
+quad_pts1 := [ ];
+quad_pts2 := [ ];
+
+for D in Ds do
     pair := Points(Intersection(PQ,D),QQ);
     quad_pts1 := quad_pts1 cat [PQQ ! Eltseq(pair[1])];
     quad_pts2 := quad_pts2 cat [PQQ ! Eltseq(pair[2])];
@@ -52,7 +62,6 @@ T1 := TranslationOfSimplex(PQQ,quad_pts1 cat [quad_pts2[1],quad_pts2[2]]);
 T2 := TranslationOfSimplex(PQQ,quad_pts2 cat [quad_pts1[1],quad_pts1[2]]);
 TofS := T2^(-1)*T1;
 EqTS:=DefiningEquations(TofS); 
-*/
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
