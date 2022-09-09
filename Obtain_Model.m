@@ -21,38 +21,36 @@ SvnPts:=PointSearch(XNSplus13,100);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-T<x> := PolynomialRing(Integers());   // Setting up a more general fieldthat contains all the square roots we need
-QQ<d1,d2,d4,d5,d6,d7>:=ext<Rationals() | x^2+11,x^2+67,x^2+2,x^2+19,x^2+163,x^2+7>;
-D1:=13*d1; D2:=13*d2; D7:=13*d7; D4:=13*d4; D5:=13*d5; D6:=13*d6;
 
-PQQ<u1,u2,u3,u4,u5,u6,u7,u8> := ProjectiveSpace(QQ,7); // Projective space to be used for translation to simplex afterwards
+// We compute the pullbacks of the seven rational points on XNSplus13
 
-S1a :=  [44 , 66 , -D1-11 , -D1-55 , -D1+55 , -2*D1+22 , D1+33 , 22]; // The simplified pairs of points
-S1b :=  [44 , 66 , +D1-11 , +D1-55 , +D1+55 , +2*D1+22 ,-D1+33 , 22];   
-S2a :=  [536 , 804 , -4*D2-134 , D2+201 , D2-201 , 4*D2+268 , 2*D2+402 , 268];
-S2b :=  [536 , 804 , +4*D2-134 ,-D2+201 ,-D2-201 ,-4*D2+268 ,-2*D2+402 , 268];
-S3a :=  [-5*D7+175 , -D7+35 , -2*D7+70 , -D7+207 , 6*D7-38 , 172 , -3*D7-67 , 172];
-S3b :=  [+5*D7+175 , +D7+35 , +2*D7+70 , +D7+207 ,-6*D7-38 , 172 , +3*D7-67 , 172];
-S4a :=  [4 , -20 , 12 , 8 , -8 ,-D4+2 , -10 , 2];
-S4b :=  [4 , -20 , 12 , 8 , -8 ,+D4+2 , -10 , 2];
-S5a :=  [-3*D5+171 , 2*D5-114 , -D5+227 , -D5-113 , -2*D5-56 , 170 , D5-57 , 170];
-S5b :=  [+3*D5+171 ,-2*D5-114 , +D5+227 , +D5-113 , +2*D5-56 , 170 ,-D5-57 , 170];
-S6a :=  [-24*D6+652 ,-36*D6+978 , 11*D6+4907 , -119*D6+10521 , 133*D6+3675 , -2*D6+10466 , -43*D6-24861 , 12494];
-S6b :=  [+24*D6+652 ,+36*D6+978 ,-11*D6+4907 , +119*D6+10521 ,-133*D6+3675 , +2*D6+10466 , +43*D6-24861 , 12494];
-S7a :=  [-3*D7+63 , -11*D7+231 , 4*D7-84 , -D7-95 , -2*D7-74 , -6*D7-222 ,-7*D7+31 , 116];
-S7b :=  [+3*D7+63 , +11*D7+231 ,-4*D7-84 , +D7-95 , +2*D7-74 , +6*D7-222 ,+7*D7+31 , 116];
+PQ := AmbientSpace(XNS13);
 
-S1aP:=PQQ ! S1a; S1bP:=PQQ ! S1b; // Coercing points into projective space
-S2aP:=PQQ ! S2a; S2bP:=PQQ ! S2b;
-S3aP:=PQQ ! S3a; S3bP:=PQQ ! S3b;
-S4aP:=PQQ ! S4a; S4bP:=PQQ ! S4b;
-S5aP:=PQQ ! S5a; S5bP:=PQQ ! S5b;
-S6aP:=PQQ ! S6a; S6bP:=PQQ ! S6b;
-S7aP:=PQQ ! S7a; S7bP:=PQQ ! S7b;
+T<x> := PolynomialRing(Rationals());   // Setting up a more general field that contains all the square roots we need
+ds := { -163, -67, -19, -11, -7, -2 };
+QQ := ext<Rationals() | [x^2 -d : d in ds] >;
+PQQ := BaseChange(PQ,QQ);
 
-T1 := TranslationOfSimplex(PQQ,[S1aP,S2aP,S3aP,S4aP,S5aP,S6aP,S7aP,S1bP,S2bP]);   // Map to take points to standard simplex in P8     
-T2 := TranslationOfSimplex(PQQ,[S1bP,S2bP,S3bP,S4bP,S5bP,S6bP,S7bP,S1aP,S2aP]); 
-TofS := T2^(-1)*T1;                               
+quad_pts1 := [ ];
+quad_pts2 := [ ];
+ds := {};
+for pt in SvnPts do
+    S := Pullback(phi, pt);
+    BS := BaseScheme(phi);
+    D := Difference(S, BS);
+    pb, K1 := PointsOverSplittingField(D);
+    K2 := NumberField(AbsolutePolynomial(K1));
+    d := Squarefree(Discriminant(Integers(K2)));
+    K := QuadraticField(d);
+    ds := ds join {d};
+    pair := Points(Intersection(PQ,D),QQ);
+    quad_pts1 := quad_pts1 cat [PQQ ! Eltseq(pair[1])];
+    quad_pts2 := quad_pts2 cat [PQQ ! Eltseq(pair[2])];
+end for;
+
+T1 := TranslationOfSimplex(PQQ,quad_pts1 cat [quad_pts2[1],quad_pts2[2]]);
+T2 := TranslationOfSimplex(PQQ,quad_pts2 cat [quad_pts1[1],quad_pts1[2]]);
+TofS := T2^(-1)*T1;
 EqTS:=DefiningEquations(TofS); 
 */
 
