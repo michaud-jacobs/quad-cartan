@@ -48,7 +48,6 @@ QQ := ext<Rationals() | [x^2 -d : d in ds] >;
 PQ := AmbientSpace(XNS13);
 PQQ := BaseChange(PQ,QQ);
 
-
 quad_pts1 := [ ];
 quad_pts2 := [ ];
 
@@ -69,30 +68,21 @@ w:=map<XNS13->XNS13 | EqTS>;          // The modular involution on the curve
 Mw:=Transpose((Matrix(w)));           // Matrix of the modular involution 
 Diag,T:=PrimaryRationalForm(Mw);      
 assert T*Mw*(T^-1) eq Diag;
-
-Eqg:=[];                              // We use T^-1 to find our change of coordinate map
-for i in [1..8] do 
-    ri:=&+[(T^-1)[i][j]*R.j : j in [1..8]];   
-    Eqg:=Eqg cat [ri];
-end for;
+                              // We use T^-1 to find our change of coordinate map
+Eqg := [&+[(T^-1)[i][j]*R.j : j in [1..8]] : i in [1..8]];
 g:=hom<R->R | Eqg>;                   // Change of coordinate map
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Apply our change of coordinates to each of the 15 equations
-Neqns:=[];            
-for i in [1..15] do
-    Neqn:=g(eqns[i]); 
-    Neqns:=Neqns cat [Neqn];
-end for;
+// Apply our change of coordinates to obtain new equations
+
+Neqns := [g(ee) : ee in old_eqns];
+assert Neqns eq new_eqns; // Matches data file
 
 // Apply change of coordinates to obtain new equations for map (to same bottom curve)
-Nphis:=[];
-for i in [1..3] do
-    Nphi:=g(eqnsphi[i]);      
-    Nphis:=Nphis cat [Nphi];
-end for;
+
+Nphis := [g(ee) : ee in eqnsphi];
 
 // We now have the following new data:
 NX:=Curve(ProjectiveSpace(R),Neqns);                         // New model of our curve
