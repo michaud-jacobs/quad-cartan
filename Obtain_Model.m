@@ -11,7 +11,7 @@ X_plus := Curve(ProjectiveSpace(S),eqn_X_plus); // The curve X_ns^+(13),
 
 rho :=map < X -> X_plus | old_rho_eqns >; 
 
-SvnPts:=PointSearch(XNSplus13,100);   
+SvnPts:=PointSearch(X_plus,100);   
 assert #SvnPts eq 7;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -24,8 +24,8 @@ assert #SvnPts eq 7;
 Ds := [];
 ds := {};
 for pt in SvnPts do
-    S := Pullback(phi, pt);
-    BS := BaseScheme(phi);
+    S := Pullback(rho, pt);
+    BS := BaseScheme(rho);
     D := Difference(S, BS);
     Ds := Ds cat [D];
     pb, K1 := PointsOverSplittingField(D);
@@ -39,7 +39,7 @@ end for;
 T<x> := PolynomialRing(Rationals());   // Setting up a more general field that contains all the square roots we need
 ds := { -163, -67, -19, -11, -7, -2 };
 QQ := ext<Rationals() | [x^2 -d : d in ds] >;
-PQ := AmbientSpace(XNS13);
+PQ := AmbientSpace(X);
 PQQ := BaseChange(PQ,QQ);
 
 quad_pts1 := [ ];
@@ -58,14 +58,13 @@ EqTS:=DefiningEquations(TofS);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-w:=map<XNS13->XNS13 | EqTS>;          // The modular involution on the curve
-Mw:=Transpose((Matrix(w)));           // Matrix of the modular involution 
+w := map< X -> X | EqTS>;          // The modular involution on the curve
+Mw:=Transpose((Matrix(w)));        // Matrix of the modular involution 
 Diag,T:=PrimaryRationalForm(Mw);      
 assert T*Mw*(T^-1) eq Diag;
-                              // We use T^-1 to find our change of coordinate map
-Eqg := [&+[(T^-1)[i][j]*R.j : j in [1..8]] : i in [1..8]];
+                              
+Eqg := [&+[(T^-1)[i][j]*R.j : j in [1..8]] : i in [1..8]]; // We use T^-1 to find our change of coordinate map
 g:=hom<R->R | Eqg>;                   // Change of coordinate map
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -76,7 +75,8 @@ assert Neqns eq new_eqns; // Matches data file
 
 // Apply change of coordinates to obtain new equations for map (to same bottom curve)
 
-Nphis := [g(ee) : ee in eqnsphi];
+Nrhos := [g(ee) : ee in old_rho_eqns];
+assert Nrhos eq new_rho_eqns; // Matches data file
 
 // We now have the following new data:
 NX:=Curve(ProjectiveSpace(R),Neqns);                         // New model of our curve
