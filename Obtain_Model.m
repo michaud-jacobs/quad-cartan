@@ -5,11 +5,11 @@
 
 load "eqn_data.m";
 
-X := Curve(ProjectiveSpace(R),old_eqns);  // The curve X_ns(13)
+old_X := Curve(ProjectiveSpace(R), old_eqns);  // The curve X_ns(13)
 
-X_plus := Curve(ProjectiveSpace(S),eqn_X_plus); // The curve X_ns^+(13),
-
-rho :=map < X -> X_plus | old_rho_eqns >; 
+X_plus := Curve(ProjectiveSpace(S), eqn_X_plus); // The curve X_ns^+(13),
+ 
+old_rho :=map < old_X -> X_plus | old_rho_eqns >; 
 
 SvnPts:=PointSearch(X_plus,100);   
 assert #SvnPts eq 7;
@@ -24,22 +24,21 @@ assert #SvnPts eq 7;
 Ds := [];
 ds := {};
 for pt in SvnPts do
-    S := Pullback(rho, pt);
-    BS := BaseScheme(rho);
+    S := Pullback(old_rho, pt);
+    BS := BaseScheme(old_rho);
     D := Difference(S, BS);
     Ds := Ds cat [D];
     pb, K1 := PointsOverSplittingField(D);
     K2 := NumberField(AbsolutePolynomial(K1));
     d := Squarefree(Discriminant(Integers(K2)));
     K := QuadraticField(d);
-    ds := ds join {d};
-    
+    ds := ds join {d};  
 end for;
 
 T<x> := PolynomialRing(Rationals());   // Setting up a more general field that contains all the square roots we need
 ds := { -163, -67, -19, -11, -7, -2 };
 QQ := ext<Rationals() | [x^2 -d : d in ds] >;
-PQ := AmbientSpace(X);
+PQ := AmbientSpace(old_X);
 PQQ := BaseChange(PQ,QQ);
 
 quad_pts1 := [ ];
@@ -58,8 +57,8 @@ EqTS:=DefiningEquations(TofS);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-w := map< X -> X | EqTS>;          // The modular involution on the curve
-Mw:=Transpose((Matrix(w)));        // Matrix of the modular involution 
+w_old := map< old_X -> old_X | EqTS>;          // The modular involution on the curve
+Mw:=Transpose((Matrix(w_old)));        // Matrix of the modular involution 
 Diag,T:=PrimaryRationalForm(Mw);      
 assert T*Mw*(T^-1) eq Diag;
                               
@@ -79,9 +78,9 @@ Nrhos := [g(ee) : ee in old_rho_eqns];
 assert Nrhos eq new_rho_eqns; // Matches data file
 
 // We now have the following new data:
-NX:=Curve(ProjectiveSpace(R),Neqns);                         // New model of our curve
-Nw:=map<NX -> NX | [x_1,x_2,x_3,-x_4,-x_5,-x_6,-x_7,-x_8]>;  // New modular involution
-Nphi:=map< NX -> XNSplus13 | Nphis >;                        // New equations for map
+X:= Curve(ProjectiveSpace(R),new_eqns);                         // New model of our curve
+w:= map<X -> X | [x_1,x_2,x_3,-x_4,-x_5,-x_6,-x_7,-x_8]>;  // New modular involution
+rho := map< X -> X_plus | new_rho_eqns >;                        // New equations for map
  
 // Check that this new model is nonsingular at the primes used (rather long).
 /*
