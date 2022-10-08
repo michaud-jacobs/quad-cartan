@@ -1,4 +1,4 @@
-// Magma code to support the calculations in the paper Quadratic.Points on Non-Split Cartan Modular Curves.
+// Magma code to support the calculations in the paper Quadratic points on non-split Cartan modular curves.
 
 // This code carries out the computations of Section 5.1 to obtain a new model for X_ns{13}. 
 // The final part of the code verifies non-singularity.

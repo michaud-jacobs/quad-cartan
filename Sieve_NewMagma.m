@@ -1,4 +1,4 @@
-// Magma code to support the calculations in the paper Quadratic.Points on Non-Split Cartan Modular Curves.
+// Magma code to support the calculations in the paper Quadratic.points on non-split Cartan modular curves.
 
 // This code carries out the sieving (and Chabauty) calculations of Section 5.4.
 
@@ -15,11 +15,28 @@ SvnPts:=PointSearch(X_plus,100);
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
+// We form a list of 7 tuples.
+// Each tuple consists of an indexed set of two conjugate quadratic points and their field of definition
+
+quad_pts_list := [* *];
+for pt in SvnPts do
+    S := Pullback(rho, pt);
+    BS := BaseScheme(rho);
+    D := Difference(S, BS);
+    pb, K1 := PointsOverSplittingField(D);
+    K2 := NumberField(AbsolutePolynomial(K1));
+    d := Squarefree(Discriminant(Integers(K2)));
+    K := QuadraticField(d);
+    ptsK := Points(D,K);  
+    quad_pts_list := quad_pts_list cat [*<ptsK, K> *];
+end for;
+
+
 
 pinsieve:=[3,5,31,43,53,61,73];  // Primes to be used in sieve 
 
-M:=3^10*5^10*13^10*29^10;
-A:=AbelianGroup([0,0,0]); 
+M:=3^10*5^10*13^10*29^10; // Parameter M to be used in the sieve
+A:=AbelianGroup([0,0,0]); // The group Z^3 (the Jacobian has rank 3)
 
 Ws:=[**]; 
 Bs:=[**];
@@ -33,49 +50,16 @@ for p in pinsieve do
     Rks:=[];      // Ranks of residue disc matrices
     TQ<x> := PolynomialRing(Integers()); 
     Fp:=GF(p);
-    Xp:=ChangeRing(NX,Fp); 
-    // assert IsNonSingular(Xp); // Long for each prime.
+    Xp:=ChangeRing(X,Fp); 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-    for i in [1..7] do                  
+    for i in [1..7] do     
+        quad_pt := quad_pts_list[i][1];
+        K := quad_pts_list[i][2];             
         Ds:=[11,67,7,2,19,163,7];       
-        K:=NumberField(x^2+Ds[i]);      
-        XK:=ChangeRing(NX,K);           
-        XplK:=ChangeRing(XNSplus13,K); 
-        phiK:=map< XK->XplK| Nphis >;   // Base change everything to new field
-
-        // Manually enter new points (compare with Sieve_OldMagma.m)
-        
-        if i eq 1 then 
-           Qa:= [-5/13*K.1, 2/13*K.1,3/13*K.1,0,-1,-2,1,1]; //XK ! Qa;
-           Qb:= [5/13*K.1, -2/13*K.1,-3/13*K.1,0,-1,-2,1,1]; //XK ! Qb;
-        end if;
-        if i eq 2 then 
-           Qa:= [-3/13*K.1,-4/13*K.1,-6/13*K.1,0,4,-4,-2,1]; //XK ! Qa;
-           Qb:= [3/13*K.1,4/13*K.1,6/13*K.1,0,4,-4,-2,1]; //XK ! Qb;
-        end if;
-        if i eq 3 then 
-           Qa:= [-7/13*K.1,-5/13*K.1,-1/13*K.1,-1,0,-1,1,1]; //XK ! Qa;
-           Qb:= [7/13*K.1,5/13*K.1,1/13*K.1,-1,0,-1,1,1]; //XK ! Qb;
-        end if;
-        if i eq 4 then 
-           Qa:= [4/13*K.1, 1/13*K.1,-5/13*K.1,0,0,1,0,0]; //XK ! Qa;
-           Qb:= [-4/13*K.1, -1/13*K.1,5/13*K.1,0,0,1,0,0]; //XK ! Qb;
-        end if;
-        if i eq 5 then 
-           Qa:= [-1/13*K.1, 3/13*K.1,-2/13*K.1,1,1,1,0,1]; //XK ! Qa;
-           Qb:= [1/13*K.1, -3/13*K.1,2/13*K.1,1,1,1,0,1]; //XK ! Qb;
-        end if;
-        if i eq 6 then 
-           Qa:= [-3/13*K.1,-2/91*K.1,-3/91*K.1,-12/7,-5/7,-10/7,25/7,1]; //XK ! Qa;
-           Qb:= [3/13*K.1,2/91*K.1,3/91*K.1,-12/7,-5/7,-10/7,25/7,1]; //XK ! Qb;
-        end if;
-        if i eq 7 then 
-           Qa:= [-1/13*K.1, 3/13*K.1,11/13*K.1,1,0,-3,-1,1]; //XK ! Qa;
-           Qb:= [1/13*K.1, -3/13*K.1,-11/13*K.1,1,0,-3,-1,1]; //XK ! Qb;
-        end if;
-           
+        Qa := quad_pt[1];
+        Qb := quad_pt[2];         
         // Code now continues in same way as Sieve_OldMagma.m
                                 
         OK:=RingOfIntegers(K);
