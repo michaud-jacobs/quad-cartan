@@ -45,8 +45,8 @@ Bs:=[**];
 
 for p in pinsieve do 
 
-    redpL:={};    // Build up to list of known divisors reduced mod p
-    divsp:=[];    // Build up to list of generators for G reduced mod p
+    H_p:={};    // Build up to list of known points mod p that pass Chabauty test
+    Ds_mod_p:=[];    // Build up to list of generators for G reduced mod p
     Rks:=[];      // Ranks of residue disc matrices
     TQ<x> := PolynomialRing(Integers()); 
     Fp:=GF(p);
@@ -56,10 +56,9 @@ for p in pinsieve do
 
     for i in [1..7] do     
         quad_pt := quad_pts_list[i][1];
-        K := quad_pts_list[i][2];             
-        Ds:=[11,67,7,2,19,163,7];       
-        Qa := quad_pt[1];
-        Qb := quad_pt[2];         
+        K := quad_pts_list[i][2];                  
+        Qa := Eltseq(quad_pt[1]);
+        Qb := Eltseq(quad_pt[2]);         
         // Code now continues in same way as Sieve_OldMagma.m
                                 
         OK:=RingOfIntegers(K);
@@ -67,7 +66,7 @@ for p in pinsieve do
         pp:=dec[1][1];                   // A prime above the rational prime p
         f:=InertiaDegree(pp);            
         Fpp<t>:= ResidueClassField(pp);  // Either GF(p) or GF(p^2) depending on inertia degree
-        Xpp:=ChangeRing(NX,Fpp);        
+        Xpp:=ChangeRing(X,Fpp);        
 
         unif:=UniformizingElement(pp);   // Use to reduce point modulo p
         m:=Minimum([Valuation(a,pp) : a in Qa | not a eq 0]);  
@@ -84,9 +83,9 @@ for p in pinsieve do
         plQtbb:=Place(Qtbb);
         plQtb:=Place(Qtb);
 
-////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////
+        // Checking if there are exceptional points in residue disc of the point
 
-// Checking if there are exceptional points in residue disc of the point
         wpp:=map< Xpp->Xpp | [x_1,x_2,x_3,-x_4,-x_5,-x_6,-x_7,-x_8] >; // Modular involution
         V,phiD:=SpaceOfDifferentialsFirstKind(Xpp);  // Holomorphic differentials on Xpp
         t:=hom<V->V | [ (Pullback(wpp,phiD(V.i)))@@phiD -V.i  : i in [1..8] ]>; 
@@ -98,8 +97,10 @@ for p in pinsieve do
         Atb:=Matrix([[Evaluate(omega/Differential(tQtb),plQtbb) : omega in oms]]);  
         ra:=Rank(Ata);
         rb:=Rank(Atb);  // Rank 1 means no exceptional points in residue class
-        if ra eq 0 then print "Point Not Lonely When i =", i; print"and p =", p; end if; 
-// An alert to say that there could potentially be an exceptional point in the residue class. 
+        if ra eq 0 then  // An alert to say that there could potentially be an exceptional point in the residue class.
+            print "Point Not Lonely When i =", i; print"and p =", p; 
+        end if; 
+         
         Rks:=Rks cat [ra];
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -110,11 +111,12 @@ for p in pinsieve do
         if Degree(plQta) eq 2 then   // if a point is defined over Fp^2
            DivQ:=Divisor(plQta);     // then form the divisor of its place
         end if;
-
-        redpL:=redpL join {DivQ};    // Include  divisors in the reductions of our known points
+        if ra eq 1 then 
+            H_p :=H_p join {DivQ};    // Include  divisors in the reductions of our known points
+        end if;
 
         if i in [1..3] then          // Reductions of generators for our subgroup G
-           divsp:=divsp cat [DivQ];
+           Ds_mod_p:=Ds_mod_p cat [DivQ];
         end if;
         if i eq 4 then               
            bpp:=DivQ;                // Reduction of our base point
@@ -135,20 +137,17 @@ for p in pinsieve do
 
     JFpmodM,pi:=quo<JFp | M*JFp>; 
 
-    imGhat:=sub<JFpmodM | [pi(JFp!psi(divp-bpp)) : divp in divsp]>; // Image of G in JFpmodM
-    poshat:={DD : DD in degr2 |pi((JFp!(psi(DD-bpp)))) in imGhat};  // Set S_{p,M}
-    posP:={DD : DD in poshat | not DD in redpL};   // Remove reductions of all known points,
-    for i in [1..7] do  // then add back in those that don't pass the Chabuaty test
-        if Rks[i] eq 0 then posP := posP join {redpL[i]}; end if; 
-    end for;
-    // posP is now T_{p,M}
-    jposP:=Setseq({pi(JFp!(psi(DD-bpp))) : DD in posP});  // The set iota_{p,M}(T_{p,M}).
+    imGhat:=sub<JFpmodM | [pi(JFp!psi(divp-bpp)) : divp in Ds_mod_p]>; // Image of G in JFpmodM
+    S_p:={DD : DD in degr2 |pi((JFp!(psi(DD-bpp)))) in imGhat};  // Set S_{p,M}
+    T_p:={DD : DD in S_p | not DD in Hp};   // Remove reductions of points in H_p
+    // T_p is now T_{p,M}
+    iT_p:=Setseq({pi(JFp!(psi(DD-bpp))) : DD in T_p});  // The set iota_{p,M}(T_{p,M}).
 
-    h:=hom<A -> JFpmodM | [pi(JFp!psi(divp-bpp)) : divp in divsp]>; // The map phi_{p,M}.
+    h:=hom<A -> JFpmodM | [pi(JFp!psi(divp-bpp)) : divp in Ds_mod_p]>; // The map phi_{p,M}.
     Bp:=Kernel(h);  
     Bp,iAp:=sub<A|Bp>; 
     Index(A,Bp);
-    Wp:={x@@h : x in jposP}; 
+    Wp:={x@@h : x in iT_p}; 
     #Wp;
     Ws:=Ws cat [* Wp *];  
     Bs:=Bs cat [* Bp *];

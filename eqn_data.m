@@ -146,3 +146,8 @@ new_eqns :=
 new_rho_eqns := [-3*x_2 + 2*x_3, 2*x_1 - 3*x_2 + x_3, x_1 + x_2 + x_3];
 
 
+
+
+
+Diag := DiagonalMatrix([1,1,1,-1,-1,-1,-1,-1]);
+
