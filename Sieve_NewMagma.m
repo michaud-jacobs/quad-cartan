@@ -6,24 +6,11 @@
 
 load "eqn_data.m";
 
-NX:=Curve(ProjectiveSpace(R),new_eqns); 
-Nw:=map<NX -> NX | [x_1,x_2,x_3,-x_4,-x_5,-x_6,-x_7,-x_8]>;  
-
-Eqphi1:=-3*x_1+2*x_2;  Eqphi2:=-3*x_1+x_2+2*x_4-2*x_5; Eqphi3:=x_1+x_2+x_4-x_5;
-eqnsphi:=[Eqphi1,Eqphi2,Eqphi3]; 
-Nphis:=[];  // 
-for i in [1..3] do
-    Nphi:=g(eqnsphi[i]); 
-    Nphis:=Nphis cat [Nphi];
-end for;
-
-S<X,Y,Z>:=PolynomialRing(Rationals(),3);   
-f:=(-Y-Z)*X^3+(2*Y^2+Z*Y)*X^2+(-Y^3+Z*Y^2-2*(Z^2)*Y+Z^3)*X+(2*Z^2*Y^2-3*Z^3*Y);
-XNSplus13:=Curve(ProjectiveSpace(S),f);
-
-Nphi:=map< NX -> XNSplus13 | Nphis >;  
-
-SvnPts:=PointSearch(XNSplus13,100);   
+X:= Curve(ProjectiveSpace(R),new_eqns);                 // New model of our curve
+X_plus := Curve(ProjectiveSpace(S), eqn_X_plus);        //  The curve X_ns^+(13)
+w:= map<X -> X | [Diag[i][i]*R.i : i in [1..8]]>;       // New modular involution
+rho := map< X -> X_plus | new_rho_eqns >;               // New equations for map
+SvnPts:=PointSearch(X_plus,100);   
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
