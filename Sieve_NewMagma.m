@@ -10,7 +10,8 @@ X:= Curve(ProjectiveSpace(R),new_eqns);                 // New model of our curv
 X_plus := Curve(ProjectiveSpace(S), eqn_X_plus);        //  The curve X_ns^+(13)
 w:= map<X -> X | [Diag[i][i]*R.i : i in [1..8]]>;       // New modular involution
 rho := map< X -> X_plus | new_rho_eqns >;               // New equations for map
-SvnPts:=PointSearch(X_plus,100);   
+
+SvnPts := [X_plus ! [0,1,0], X_plus ! [0,0,1], X_plus ! [-1,0,1], X_plus ! [1,0,0], X_plus ! [1,1,0], X_plus ! [0,3,2], X_plus ! [1,0,1]]; 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -83,6 +84,13 @@ for p in pinsieve do
         plQtbb:=Place(Qtbb);
         plQtb:=Place(Qtb);
 
+       if Degree(plQta) eq 1 then   // if a point is defined over Fp
+           DivQ:=plQta+plQtb;        // then form a divisor from the point and its conjugate
+        end if;
+        if Degree(plQta) eq 2 then   // if a point is defined over Fp^2
+           DivQ:=Divisor(plQta);     // then form the divisor of its place
+        end if;
+
         ////////////////////////////////////////////////////////////////////////////////
         // Checking if there are exceptional points in residue disc of the point
 
@@ -92,25 +100,14 @@ for p in pinsieve do
         T:=Image(t);                                 // The space red(V_0)
         oms:=[phiD(T.i) : i in [1..Dimension(T)]]; 
         tQta:=UniformizingParameter(Qtaa);  
-        tQtb:=UniformizingParameter(Qtbb);
         Ata:=Matrix([[Evaluate(omega/Differential(tQta),plQtaa) : omega in oms]]);
-        Atb:=Matrix([[Evaluate(omega/Differential(tQtb),plQtbb) : omega in oms]]);  
-        ra:=Rank(Ata);
-        rb:=Rank(Atb);  // Rank 1 means no exceptional points in residue class
+        ra:=Rank(Ata); // Rank 1 means no exceptional points in residue class
         if ra eq 0 then  // An alert to say that there could potentially be an exceptional point in the residue class.
             print "Point Not Lonely When i =", i; print"and p =", p; 
         end if; 
-         
-        Rks:=Rks cat [ra];
 
-////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////
 
-        if Degree(plQta) eq 1 then   // if a point is defined over Fp
-           DivQ:=plQta+plQtb;        // then form a divisor from the point and its conjugate
-        end if;
-        if Degree(plQta) eq 2 then   // if a point is defined over Fp^2
-           DivQ:=Divisor(plQta);     // then form the divisor of its place
-        end if;
         if ra eq 1 then 
             H_p :=H_p join {DivQ};    // Include  divisors in the reductions of our known points
         end if;
@@ -139,15 +136,14 @@ for p in pinsieve do
 
     imGhat:=sub<JFpmodM | [pi(JFp!psi(divp-bpp)) : divp in Ds_mod_p]>; // Image of G in JFpmodM
     S_p:={DD : DD in degr2 |pi((JFp!(psi(DD-bpp)))) in imGhat};  // Set S_{p,M}
-    T_p:={DD : DD in S_p | not DD in Hp};   // Remove reductions of points in H_p
-    // T_p is now T_{p,M}
+    T_p:={DD : DD in S_p | not DD in H_p};   // Remove reductions of points in H_{p,M} to obtain T_{p,M}
     iT_p:=Setseq({pi(JFp!(psi(DD-bpp))) : DD in T_p});  // The set iota_{p,M}(T_{p,M}).
 
-    h:=hom<A -> JFpmodM | [pi(JFp!psi(divp-bpp)) : divp in Ds_mod_p]>; // The map phi_{p,M}.
-    Bp:=Kernel(h);  
+    phi_p:=hom<A -> JFpmodM | [pi(JFp!psi(divp-bpp)) : divp in Ds_mod_p]>; // The map phi_{p,M}.
+    Bp:=Kernel(phi_p);  
     Bp,iAp:=sub<A|Bp>; 
     Index(A,Bp);
-    Wp:={x@@h : x in iT_p}; 
+    Wp:={x @@ phi_p : x in iT_p}; 
     #Wp;
     Ws:=Ws cat [* Wp *];  
     Bs:=Bs cat [* Bp *];
