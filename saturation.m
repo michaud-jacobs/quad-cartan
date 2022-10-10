@@ -5,10 +5,15 @@
 C := Curve(ProjectiveSpace(S), eqn_X_plus); //  The curve X_ns^+(13)
 
 l := 41; // Prime to test 
+print("Testing saturation for l ="), l;
+Zl3:=AbelianGroup([l,l,l]); 
 
-Zl3:=AbelianGroup([l,l,l]);          
-Kps:=[];          
-for p in [2,37,83,101] do                                                  
+aux_p := [2, 37, 83];   // 101
+Int_Kp := Zl3;
+Kps:=[];  
+Int_Kp_sizes := [];        
+for p in aux_p do   
+    print "Using auxiliary prime p = ", p;                                               
     Cp:=ChangeRing(C,GF(p));           
     ClGrp,phi,psi:=ClassGroup(Cp);
     Z:=FreeAbelianGroup(1);
@@ -23,11 +28,19 @@ for p in [2,37,83,101] do
     pi_p:=hom<Zl3->JFpmodl | [pi(Del_1),pi(Del_2),pi(Del_3)]>; 
     Kp:=Kernel(pi_p);
     Kps:=Kps cat [Kp];
-    print  "Calculations completed for p =", p;
+    Int_Kp := Int_Kp meet Kp;
+    Int_Kp_sizes := Int_Kp_sizes cat [#Int_Kp];
+    print "Int_Kp has size", #Int_Kp;
+    print "+++++++++";
+    if #Int_Kp eq 1 then 
+        print "++++++++++++++++++++++++++++++++";
+        print "Index not divisible by", l;
+        break;
+    end if;
 end for;
 
-IntKp:=&meet(Kps);  // Intersection of kernels
-if #IntKp eq 1 then 
-print "Index not divisible by", l;          
+if #Int_Kp ne 1 then 
+    print "++++++++++++++++++++++++++++++++";
+    print "Index may be divisible by", l;          
 end if;
 
