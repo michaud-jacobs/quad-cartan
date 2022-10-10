@@ -32,8 +32,6 @@ for pt in SvnPts do
     quad_pts_list := quad_pts_list cat [*<ptsK, K> *];
 end for;
 
-
-
 primes_for_sieve:=[3,5,31,43,53,61,73];  // Primes to be used in sieve 
 
 M:=3^10*5^10*13^10*29^10; // Parameter M to be used in the sieve
@@ -189,3 +187,5 @@ if W ne {} then
     print "Sieving complete, unsuccessful";
 end if;
 
+print "Indices of B_int:", indices_int;
+print "Coset sizes of W_int:", coset_sizes_int;
