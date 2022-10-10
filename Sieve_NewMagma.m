@@ -41,11 +41,19 @@ A:=AbelianGroup([0,0,0]); // The group Z^3 (the Jacobian has rank 3)
 
 Ws:=[**]; 
 Bs:=[**];
+indices_int := [];
+indices_2 := [];
+coset_sizes_int := [];
+coset_sizes_2 := [];
+
+B,iA:=sub<A|A>; 
+W:={0*A.1};     
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 for p in pinsieve do 
 
+    print("Starting calculations for p ="), p;
     H_p:={};    // Build up to list of known points mod p that pass Chabauty test
     Ds_mod_p:=[];    // Build up to list of generators for G reduced mod p
     Rks:=[];      // Ranks of residue disc matrices
@@ -125,13 +133,12 @@ for p in pinsieve do
 
     pls1p:=Places(Xp,1);   // The degree 1 places on Xp 
     pls2p:=Places(Xp,2);   //  The degree 2 places on Xp 
-    //Degree 2 divisors on Xp
-    degr2:={1*pl1 + 1*pl2 : pl1 in pls1p, pl2 in pls1p} join {1*pl : pl in pls2p}; 
+    degr2:={1*pl1 + 1*pl2 : pl1 in pls1p, pl2 in pls1p} join {1*pl : pl in pls2p};  //Degree 2 divisors on Xp
+    print("Computing the Jacobian mod"),p;
     time C,phi,psi:=ClassGroup(Xp); 
     Z:=FreeAbelianGroup(1);
     degr:=hom<C->Z | [ Degree(phi(a))*Z.1 : a in OrderedGenerators(C)]>;  
     JFp:=Kernel(degr);     // This is isomorphic to J_X(\F_p)
-
     JFpmodM,pi:=quo<JFp | M*JFp>; 
 
     imGhat:=sub<JFpmodM | [pi(JFp!psi(divp-bpp)) : divp in Ds_mod_p]>; // Image of G in JFpmodM
@@ -142,19 +149,48 @@ for p in pinsieve do
     phi_p:=hom<A -> JFpmodM | [pi(JFp!psi(divp-bpp)) : divp in Ds_mod_p]>; // The map phi_{p,M}.
     Bp:=Kernel(phi_p);  
     Bp,iAp:=sub<A|Bp>; 
-    Index(A,Bp);
+    ind2 := Index(A,Bp);
+    indices_2 := indices_2 cat [ind2];
+    printf "Index of B_%o in Z^3 is %o", p, ind2;
     Wp:={x @@ phi_p : x in iT_p}; 
-    #Wp;
+    coset_sizes_2 := coset_sizea_2 cat [#Wp];
+    printf "W_%o has %o elements", p, #Wp;
     Ws:=Ws cat [* Wp *];  
     Bs:=Bs cat [* Bp *];
-    print "Calculations completed for p =", p;  
+
+    Bnew,iBp:=sub<Bp | B meet Bp>;
+    iAnew:=iBp*iAp;
+    A0,pi0:=quo<A | iAnew(Bnew)>;
+    Ap,pi0p:=quo<A0 | pi0(iAp(Bp))>;
+    A1,pi01:=quo<A0 | pi0(iA(B))>;
+    pi1:=pi0*pi01;
+    pip:=pi0*pi0p;
+    W:={x@@pi0 : x in {(pi1(y))@@pi01 +k : y in W, k in Kernel(pi01)} | pi0p(x) in pip(Wp)};
+    B:=Bnew;
+    iA:=iAnew;
+    ind_int := Index(A,b);
+    print "Index of B_int in Z^3 is", ind_int;
+    indices_int := indices_int cat [ind_int];
+    coset_sizes_int := coset_sizes_int cat [#W];
+    print "W_int has", #W, "elements";
+    print "Calculations completed for p =", p;
+    if W eq {} then 
+       print "Sieving complete, success";
+       break;   
+    end if; 
 end for;
+
+if W ne {} then 
+    print "Sieving complete, unsuccessful";
+end if;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
 // We now intersect the coset lists W_{p,M}
+
+
 
 B,iA:=sub<A|A>; 
 W:={0*A.1};     
