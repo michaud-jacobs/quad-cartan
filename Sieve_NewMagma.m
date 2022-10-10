@@ -34,7 +34,7 @@ end for;
 
 
 
-pinsieve:=[3,5,31,43,53,61,73];  // Primes to be used in sieve 
+primes_for_sieve:=[3,5,31,43,53,61,73];  // Primes to be used in sieve 
 
 M:=3^10*5^10*13^10*29^10; // Parameter M to be used in the sieve
 A:=AbelianGroup([0,0,0]); // The group Z^3 (the Jacobian has rank 3)
@@ -51,7 +51,7 @@ W:={0*A.1};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-for p in pinsieve do 
+for p in primes_for_sieve do 
 
     print("Starting calculations for p ="), p;
     H_p:={};    // Build up to list of known points mod p that pass Chabauty test
@@ -139,41 +139,46 @@ for p in pinsieve do
     Z:=FreeAbelianGroup(1);
     degr:=hom<C->Z | [ Degree(phi(a))*Z.1 : a in OrderedGenerators(C)]>;  
     JFp:=Kernel(degr);     // This is isomorphic to J_X(\F_p)
+    print "The Jacobian mod", p, "is isomorphic to", [Order(ee) : ee in Generators(JFp)];
     JFpmodM,pi:=quo<JFp | M*JFp>; 
-
+    print "The Jacobian mod M is isomorphic to ", [Order(ee) : ee in Generators(JFpmodM)];
+    
     imGhat:=sub<JFpmodM | [pi(JFp!psi(divp-bpp)) : divp in Ds_mod_p]>; // Image of G in JFpmodM
     S_p:={DD : DD in degr2 |pi((JFp!(psi(DD-bpp)))) in imGhat};  // Set S_{p,M}
     T_p:={DD : DD in S_p | not DD in H_p};   // Remove reductions of points in H_{p,M} to obtain T_{p,M}
     iT_p:=Setseq({pi(JFp!(psi(DD-bpp))) : DD in T_p});  // The set iota_{p,M}(T_{p,M}).
 
     phi_p:=hom<A -> JFpmodM | [pi(JFp!psi(divp-bpp)) : divp in Ds_mod_p]>; // The map phi_{p,M}.
-    Bp:=Kernel(phi_p);  
-    Bp,iAp:=sub<A|Bp>; 
-    ind2 := Index(A,Bp);
+    B_p:=Kernel(phi_p);  
+    B_p,iAp:=sub<A|B_p>; 
+    ind2 := Index(A,B_p);
     indices_2 := indices_2 cat [ind2];
-    printf "Index of B_%o in Z^3 is %o", p, ind2;
-    Wp:={x @@ phi_p : x in iT_p}; 
-    coset_sizes_2 := coset_sizea_2 cat [#Wp];
-    printf "W_%o has %o elements", p, #Wp;
-    Ws:=Ws cat [* Wp *];  
-    Bs:=Bs cat [* Bp *];
+    printf "Index of B_%o in Z^3 is %o", p, ind2; 
+    printf "\n";
+    W_p:={x @@ phi_p : x in iT_p}; 
+    coset_sizes_2 := coset_sizes_2 cat [#W_p];
+    printf "W_%o has %o elements", p, #W_p;
+    printf "\n";
+    Ws:=Ws cat [* W_p *];  
+    Bs:=Bs cat [* B_p *];
 
-    Bnew,iBp:=sub<Bp | B meet Bp>;
-    iAnew:=iBp*iAp;
+    Bnew,iB_p:=sub<B_p | B meet B_p>;
+    iAnew:=iB_p*iAp;
     A0,pi0:=quo<A | iAnew(Bnew)>;
-    Ap,pi0p:=quo<A0 | pi0(iAp(Bp))>;
+    Ap,pi0p:=quo<A0 | pi0(iAp(B_p))>;
     A1,pi01:=quo<A0 | pi0(iA(B))>;
     pi1:=pi0*pi01;
     pip:=pi0*pi0p;
-    W:={x@@pi0 : x in {(pi1(y))@@pi01 +k : y in W, k in Kernel(pi01)} | pi0p(x) in pip(Wp)};
+    W:={x@@pi0 : x in {(pi1(y))@@pi01 +k : y in W, k in Kernel(pi01)} | pi0p(x) in pip(W_p)};
     B:=Bnew;
     iA:=iAnew;
-    ind_int := Index(A,b);
+    ind_int := Index(A,B);
     print "Index of B_int in Z^3 is", ind_int;
     indices_int := indices_int cat [ind_int];
     coset_sizes_int := coset_sizes_int cat [#W];
     print "W_int has", #W, "elements";
     print "Calculations completed for p =", p;
+    print "+++++++++++++++++++++++++++++++++++++++++";
     if W eq {} then 
        print "Sieving complete, success";
        break;   
@@ -184,34 +189,3 @@ if W ne {} then
     print "Sieving complete, unsuccessful";
 end if;
 
-////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////
-
-// We now intersect the coset lists W_{p,M}
-
-
-
-B,iA:=sub<A|A>; 
-W:={0*A.1};     
-
-for i in [1..#pinsieve] do 
-    if Ws[1] eq {} then print true; end if;  
-    Bs[i],iAp:=sub<A | Bs[i]>;   
-    Bnew,iBp:=sub<Bs[i] | B meet Bs[i]>; // Now intersect Bp+Wp and B+W.
-    iAnew:=iBp*iAp;
-    A0,pi0:=quo<A | iAnew(Bnew)>;
-    Ap,pi0p:=quo<A0 | pi0(iAp(Bs[i]))>;
-    A1,pi01:=quo<A0 | pi0(iA(B))>;
-    pi1:=pi0*pi01;
-    pip:=pi0*pi0p;
-    W:={x@@pi0 : x in {(pi1(y))@@pi01 +k : y in W, k in Kernel(pi01)} | pi0p(x) in pip(Ws[i])};
-    #W;
-    B:=Bnew;
-    Index(A,B);
-    iA:=iAnew;
-    if W eq {} then print "true at i =", i; end if; 
-end for;
-Wsieved:=W; // Output of the final sieved cosets
-Bsieved:=B; // Wsieved are cosets in Z^3 of Bsieved
-if Wsieved eq {} then print true; end if; // This means we have found all the quadratic points! 
