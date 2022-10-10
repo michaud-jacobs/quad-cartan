@@ -10,9 +10,8 @@ old_X := Curve(ProjectiveSpace(R), old_eqns);  // The curve X_ns(13)
 X_plus := Curve(ProjectiveSpace(S), eqn_X_plus); // The curve X_ns^+(13),
  
 old_rho :=map < old_X -> X_plus | old_rho_eqns >; 
-
-SvnPts:=PointSearch(X_plus,100);   
-assert #SvnPts eq 7;
+ 
+SvnPts := [X_plus ! [0,1,0], X_plus ! [0,0,1], X_plus ! [-1,0,1], X_plus ! [1,0,0], X_plus ! [1,1,0], X_plus ! [0,3,2], X_plus ! [1,0,1]];  
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
