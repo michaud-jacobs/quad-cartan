@@ -1,8 +1,8 @@
-// Magma code to support the calculations in the paper Quadratic.points on non-split Cartan modular curves.
+/// Magma code to support the computations in the paper Quadratic points on non-split Cartan modular curves by Philippe Michaud-Jacobs.
+// See https://github.com/michaud-jacobs/quad-cartan for all the code files and links to the paper
 
-// This code carries out the sieving (and Chabauty) calculations of Section 5.4.
-
-// This code runs on Magma-2.26-2, whereas the file Sieve_OldMagma.m runs on Magma-2.25-3.
+// The code in this file carries out the sieving (and Chabauty) steps.
+// The code works on Magma V2.26-10
 
 load "eqn_data.m";
 
@@ -33,6 +33,7 @@ for pt in SvnPts do
 end for;
 
 primes_for_sieve:=[3,5,31,43,53,61,73];  // Primes to be used in sieve 
+// Nonsingularity at these primes was verified in the model.m file
 
 M:=3^10*5^10*13^10*29^10; // Parameter M to be used in the sieve
 A:=AbelianGroup([0,0,0]); // The group Z^3 (the Jacobian has rank 3)

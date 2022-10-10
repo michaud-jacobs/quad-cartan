@@ -1,3 +1,8 @@
+Magma code to support the computations in the paper Quadratic points on non-split Cartan modular curves by Philippe Michaud-Jacobs.
+See https://github.com/michaud-jacobs/quad-cartan for all the code files and links to the paper
+
+This is the output of the sieve.m file
+
 Starting calculations for p = 3
 Computing the Jacobian mod 3
 Time: 3.300

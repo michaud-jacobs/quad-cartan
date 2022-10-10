@@ -1,15 +1,21 @@
-// Magma code to support the calculations in the paper Quadratic points on non-split Cartan modular curves.
+// Magma code to support the computations in the paper Quadratic points on non-split Cartan modular curves by Philippe Michaud-Jacobs.
+// See https://github.com/michaud-jacobs/quad-cartan for all the code files and links to the paper
 
-// This code carries out the computations of Section 5.5 to test saturation.
+// The code in this file concerns the saturation step
+// See saturation_output.txt for the output
+// The code works on Magma V2.26-10
 
 load "eqn_data.m";
 
 C := Curve(ProjectiveSpace(S), eqn_X_plus); //  The curve X_ns^+(13)
 
+// This function takes as input a prime l and a sequence of auxiliary primes [p_1, ... , p_n]
+// It tries to prove that the index in question is not divisible by l
+// See the functions below for help choosing the primes in aux_p
 
 saturation_test := function(l,aux_p);    
     Zl3:=AbelianGroup([l,l,l]); 
-    Int_Kp := Zl3;
+    Int_Kp := Zl3;  
     Kps:=[];  
     Int_Kp_sizes := [];        
     for p in aux_p do   
@@ -24,9 +30,9 @@ saturation_test := function(l,aux_p);
     
         Del_1 := psi(Place(Cp ! [0,1,0])  - Place(Cp ! [1,0,0]));
         Del_2 := psi(Place(Cp ! [0,0,1])  - Place(Cp ! [1,0,0]));
-        Del_3 := psi(Place(Cp ! [-1,0,1]) - Place(Cp ! [1,0,0]));
+        Del_3 := psi(Place(Cp ! [-1,0,1]) - Place(Cp ! [1,0,0]));  // Generators for the group G^+ mod p
 
-        pi_p:=hom<Zl3->JFpmodl | [pi(Del_1),pi(Del_2),pi(Del_3)]>; 
+        pi_p:=hom<Zl3->JFpmodl | [pi(Del_1),pi(Del_2),pi(Del_3)]>; // The map pi_p
         Kp:=Kernel(pi_p);
         Kps:=Kps cat [Kp];
         Int_Kp := Int_Kp meet Kp;
@@ -50,7 +56,8 @@ saturation_test := function(l,aux_p);
 end function;
 
 
-
+// Given l, we choose primes p such that l divides #J(F_p)
+// We first compute the exponent of J(F_p) for all primes p < 500 with p not 13.
 
 // The following takes quite a long time.
 // The (formatted) output is available in the saturation_output.txt file
@@ -74,6 +81,8 @@ end for;
 
 print "JFp_data :=", JFp_data, ";"; // see output file
 
+// The following function chooses auxiliary primes for a given l, using the data computed above
+
 aux_prime_chooser := function(l,JFp_data);
     aux := [];
     for p in PrimesInInterval(2,#JFp_data) do
@@ -84,6 +93,8 @@ aux_prime_chooser := function(l,JFp_data);
     return aux;
 end function;
 
+// We now prove that the index is not divisible by the following primes l
+// The output is available in saturation_output.txt 
 
 ls_to_test := [3,5,13,29];
 

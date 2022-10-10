@@ -1,3 +1,10 @@
+// Magma code to support the computations in the paper Quadratic points on non-split Cartan modular curves by Philippe Michaud-Jacobs.
+// See https://github.com/michaud-jacobs/quad-cartan for all the code files and links to the paper
+
+// The code in this file includes equations for curves and maps.
+// The code works on Magma V2.26-10
+
+
 R<x_1,x_2,x_3,x_4,x_5,x_6,x_7,x_8>:=PolynomialRing(Rationals(),8); 
 S<X,Y,Z>:=PolynomialRing(Rationals(),3);   
 
@@ -73,6 +80,8 @@ old_rho_eqns := [-3*x_1+2*x_2, -3*x_1+x_2+2*x_4-2*x_5, x_1+x_2+x_4-x_5];
 
 //////////////////////////////////////////////////////////////////////////////////
 
+// Equations for new model of X_ns(13)
+
 new_eqns := 
 [
     -2*x_1^2 + x_1*x_2 - 3*x_1*x_3 + x_1*x_4 - 4*x_1*x_5 - x_1*x_7 + 3*x_2^2 + 
@@ -145,9 +154,7 @@ new_eqns :=
 
 new_rho_eqns := [-3*x_2 + 2*x_3, 2*x_1 - 3*x_2 + x_3, x_1 + x_2 + x_3];
 
-
-
-
+// Diagonalised matrix of involution on new model
 
 Diag := DiagonalMatrix([1,1,1,-1,-1,-1,-1,-1]);
 

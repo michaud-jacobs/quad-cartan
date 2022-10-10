@@ -1,7 +1,8 @@
-// Magma code to support the calculations in the paper Quadratic points on non-split Cartan modular curves.
+// Magma code to support the computations in the paper Quadratic points on non-split Cartan modular curves by Philippe Michaud-Jacobs.
+// See https://github.com/michaud-jacobs/quad-cartan for all the code files and links to the paper
 
-// This code carries out the computations of Section 5.1 to obtain a new model for X_ns{13}. 
-// The final part of the code verifies non-singularity.
+// The code in this file obtains a new model for the curve X_ns(13)
+// The code works on Magma V2.26-10
 
 load "eqn_data.m";
 
@@ -103,14 +104,13 @@ rho := map< X -> X_plus | new_rho_eqns >;                        // New equation
  
 
 
-// Check that this new model is nonsingular at the primes used (rather long).
-/*
+// Check that this new model is nonsingular at the primes used in the sieve (rather long, hours for p = 73).
+
 for p in [3,5,31,43,53,61,73] do 
     print "Starting p =", p;
     NXp:=ChangeRing(NX,GF(p));
     assert IsNonsingular(NXp);
-    print "Nonsingular mod", p;
 end for;
-*/
+
 
 
