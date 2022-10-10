@@ -1,39 +1,33 @@
-// Magma code to support the calculations in the paper Quadratic.Points on Non-Split Cartan Modular Curves.
+// Magma code to support the calculations in the paper Quadratic points on non-split Cartan modular curves.
 
 // This code carries out the computations of Section 5.5 to test saturation.
 
-// Defining X_{ns}^+(13).
-S<X,Y,Z>:=PolynomialRing(Rationals(),3);   
-f:=(-Y-Z)*X^3+(2*Y^2+Z*Y)*X^2+(-Y^3+Z*Y^2-2*(Z^2)*Y+Z^3)*X+(2*Z^2*Y^2-3*Z^3*Y);
-C:=Curve(ProjectiveSpace(S),f);
+C := Curve(ProjectiveSpace(S), eqn_X_plus); //  The curve X_ns^+(13)
 
-p := 41; // Primes to test 
+l := 41; // Prime to test 
 
-Zp3:=AbelianGroup([p,p,p]);          
-Kls:=[];                            
-for i in [1,12,23,26] do //   
-    l:=NthPrime(i);                                  
-    Cl:=ChangeRing(C,GF(l));           
-    ClGrp,phi,psi:=ClassGroup(Cl);
+Zl3:=AbelianGroup([l,l,l]);          
+Kps:=[];          
+for p in [2,37,83,101] do                                                  
+    Cp:=ChangeRing(C,GF(p));           
+    ClGrp,phi,psi:=ClassGroup(Cp);
     Z:=FreeAbelianGroup(1);
     degr:=hom<ClGrp->Z | [ Degree(phi(a))*Z.1 : a in OrderedGenerators(ClGrp)]>;  
-    JFl:=Kernel(degr);                 // Jacobian mod l as an abelian group
-    JFlmodp,pi:=quo<JFl | p*JFl>;   
+    JFp:=Kernel(degr);                 // Jacobian mod p as an abelian group
+    JFpmodl,pi:=quo<JFp | l*JFp>;      // J(F_p) / l*J(F_p)
     
-    h1p:= Place(Cl ! [0,1,0]);
-    h2p:= Place(Cl ! [0,0,1]);
-    h3p:= Place(Cl ! [-1,0,1]);
-    bp := Place(Cl ! [1,0,0]);
-    Delta1p:=h1p-bp; Delta2p:=h2p-bp; Delta3p:=h3p-bp;  // Generators of H
+    Del_1 := psi(Place(Cp ! [0,1,0])  - Place(Cp ! [1,0,0]));
+    Del_2 := psi(Place(Cp ! [0,0,1])  - Place(Cp ! [1,0,0]));
+    Del_3 := psi(Place(Cp ! [-1,0,1]) - Place(Cp ! [1,0,0]));
 
-    pil:=hom<Zp3->JFlmodp | [pi(psi(Delta1p)),pi(psi(Delta2p)),pi(psi(Delta3p))]>; 
-    Kl:=Kernel(pil);
-    Kls:=Kls cat [Kl];
-    print  "Calculations completed for l =", l;
+    pi_p:=hom<Zl3->JFpmodl | [pi(Del_1),pi(Del_2),pi(Del_3)]>; 
+    Kp:=Kernel(pi_p);
+    Kps:=Kps cat [Kp];
+    print  "Calculations completed for p =", p;
 end for;
 
-IntKl:=&meet(Kls);  // Intersection of kernels
-if #IntKl eq 1 then 
-print "Index not divisible by", p;          
+IntKp:=&meet(Kps);  // Intersection of kernels
+if #IntKp eq 1 then 
+print "Index not divisible by", l;          
 end if;
 
