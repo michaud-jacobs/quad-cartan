@@ -1,5 +1,5 @@
 # quad-cartan
-Code to accompany the author's paper "Quadratic points on non-split Cartan modular curves".
+Code to accompany the paper "Quadratic points on non-split Cartan modular curves" by Philippe Michaud-Jacobs (Michaud-Rodgers).
 The paper is written under my previous surname, Michaud-Rodgers.
 
 The paper is available on arXiv here: https://arxiv.org/abs/2011.00590.
