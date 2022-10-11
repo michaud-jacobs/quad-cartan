@@ -3,7 +3,7 @@ Code to accompany the paper "Quadratic points on non-split Cartan modular curves
 The paper is written under my previous surname, Michaud-Rodgers.
 
 The paper is available on arXiv here: https://arxiv.org/abs/2011.00590.
-The published version of the paper is available here: https://www.worldscientific.com/doi/abs/10.1142/S1793042122500178.
+The published version of the paper is available here: https://doi.org/10.48550/arXiv.2011.00590.
 
 The repository contains the following files (more description is contained within each file):
 
